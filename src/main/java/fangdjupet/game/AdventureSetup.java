@@ -1,6 +1,8 @@
 package fangdjupet.game;
 
 import fangdjupet.combat.Enemy;
+import fangdjupet.combat.EnemyFactory;
+import fangdjupet.combat.EnemyType;
 import fangdjupet.combat.Hero;
 import fangdjupet.combat.MagicAttack;
 import fangdjupet.combat.MeleeAttack;
@@ -11,7 +13,6 @@ import java.util.List;
 
 /**
  * Skapar hjälte och fiender för ett nytt äventyr.
- * Tillfällig lösning: fienderna ska senare skapas av en EnemyFactory i föremålsmodulen.
  */
 public final class AdventureSetup {
     private static final String DEFAULT_HERO_NAME = "Hjälten";
@@ -32,11 +33,10 @@ public final class AdventureSetup {
     }
 
     public static List<Enemy> createEnemies() {
-        MeleeAttack melee = new MeleeAttack();
         return List.of(
-                new Enemy("Råttan", 1, 10, 4, 0, melee),
-                new Enemy("Goblinen", 2, 18, 6, 2, melee),
-                new Enemy("Trollet", 3, 24, 9, 4, melee)
+                EnemyFactory.create(EnemyType.RAT, 1),
+                EnemyFactory.create(EnemyType.GOBLIN, 2),
+                EnemyFactory.create(EnemyType.TROLL, 3)
         );
     }
 }
