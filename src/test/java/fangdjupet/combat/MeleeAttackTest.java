@@ -20,7 +20,7 @@ class MeleeAttackTest {
         Hero hero = new Hero("Hjälten", 30, 2, 2, melee);
         Enemy golem = new Enemy("Golemen", 1, 20, 5, 10, melee);
 
-        assertEquals(MeleeAttack.MINIMUM_DAMAGE, melee.calculateDamage(hero, golem));
+        assertEquals(DamageRules.MINIMUM_DAMAGE, melee.calculateDamage(hero, golem));
     }
 
     @Test
