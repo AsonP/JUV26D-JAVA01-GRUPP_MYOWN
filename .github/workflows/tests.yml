@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hämta koden
+        uses: actions/checkout@v6
+
+      - name: Installera Java 27 (förhandsversion)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '27-ea'
+          cache: maven
+
+      - name: Gör Maven Wrapper körbar
+        run: chmod +x mvnw
+
+      - name: Kör testerna
+        run: ./mvnw -B test
