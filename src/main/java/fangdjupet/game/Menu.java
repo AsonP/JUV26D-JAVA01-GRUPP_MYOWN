@@ -6,6 +6,7 @@ import fangdjupet.contract.Combatant;
 import fangdjupet.contract.Equippable;
 import fangdjupet.contract.Item;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,11 +17,15 @@ import java.util.Scanner;
 public class Menu {
     private final Scanner scanner;
     private final Game game;
+    private final SaveManager saveManager;
+    private final Path saveFile;
     private boolean running;
 
-    public Menu(Scanner scanner, Game game) {
+    public Menu(Scanner scanner, Game game, SaveManager saveManager, Path saveFile) {
         this.scanner = scanner;
         this.game = game;
+        this.saveManager = saveManager;
+        this.saveFile = saveFile;
     }
 
     public void run() {
@@ -67,6 +72,7 @@ public class Menu {
         Combatant hero = game.getHero().orElseThrow();
         System.out.println(hero.getName() + " kliver ner i Fångdjupet med " + attackStyle.getName().toLowerCase()
                 + ". " + game.getRemainingEnemyCount() + " fiender väntar.");
+        autoSave();
     }
 
     private AttackStrategy chooseAttackStyle() {
@@ -94,7 +100,15 @@ public class Menu {
     }
 
     private void continueSavedAdventure() {
-        notImplemented("Fortsätt sparat äventyr");
+        try {
+            game.restore(saveManager.load(saveFile));
+        } catch (SaveGameException e) {
+            System.out.println(e.getMessage() + ".");
+            return;
+        }
+        Hero hero = game.getHero().orElseThrow();
+        System.out.println(hero.getName() + " har " + hero.getHealth() + "/" + hero.getMaxHealth()
+                + " i hälsa. Fiender kvar: " + game.getRemainingEnemyCount());
     }
 
     private void showEquipment() {
@@ -135,7 +149,9 @@ public class Menu {
         }
         if (game.drinkPotion().isEmpty()) {
             System.out.println("Du har ingen läkedryck att dricka.");
+            return;
         }
+        autoSave();
     }
 
     private void fightNextEnemy() {
@@ -151,6 +167,7 @@ public class Menu {
         System.out.println("Du möter " + enemy.getName() + "!");
         game.fightRound();
         printOutcome();
+        autoSave();
     }
 
     private void printOutcome() {
@@ -166,8 +183,25 @@ public class Menu {
     }
 
     private void quit() {
+        if (game.hasActiveAdventure() && !game.isOver()) {
+            autoSave();
+            System.out.println("Ditt äventyr är sparat. Välj 2 nästa gång för att fortsätta.");
+        }
         System.out.println("Tack för att du spelade Fångdjupet!");
         running = false;
+    }
+
+    /** Sparar ett pågående äventyr, eller tar bort sparfilen om äventyret är slut. */
+    private void autoSave() {
+        try {
+            if (game.isOver()) {
+                saveManager.delete(saveFile);
+            } else {
+                saveManager.save(game, saveFile);
+            }
+        } catch (SaveGameException e) {
+            System.out.println("Varning: " + e.getMessage());
+        }
     }
 
     /** Skriver ut ett meddelande och returnerar false om inget äventyr pågår. */
@@ -177,9 +211,5 @@ public class Menu {
             return false;
         }
         return true;
-    }
-
-    private void notImplemented(String feature) {
-        System.out.println(feature + " är inte implementerat ännu.");
     }
 }

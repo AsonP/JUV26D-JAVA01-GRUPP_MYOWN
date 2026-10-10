@@ -55,6 +55,15 @@ public class SaveManager {
         }
     }
 
+    /** Tar bort sparfilen, t.ex. när äventyret är slut. Gör inget om filen inte finns. */
+    public void delete(Path file) throws SaveGameException {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            throw new SaveGameException("Kunde inte ta bort " + file, e);
+        }
+    }
+
     public SavedAdventure load(Path file) throws SaveGameException {
         List<String> lines = readLines(file);
         Hero hero = null;

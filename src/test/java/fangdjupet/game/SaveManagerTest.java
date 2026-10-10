@@ -103,6 +103,15 @@ class SaveManagerTest {
     }
 
     @Test
+    void deletedSaveCannotBeLoaded() throws SaveGameException {
+        saveManager.save(game, saveFile);
+
+        saveManager.delete(saveFile);
+
+        assertThrows(SaveGameException.class, () -> saveManager.load(saveFile));
+    }
+
+    @Test
     void savingWithoutAdventureThrows() {
         assertThrows(SaveGameException.class, () -> saveManager.save(new Game(), saveFile));
     }
