@@ -55,6 +55,16 @@ public abstract class BaseCharacter implements Combatant {
         return baseDefense;
     }
 
+    /** Anfall utan bonusar från utrustning. */
+    public int getBaseAttack() {
+        return baseAttack;
+    }
+
+    /** Försvar utan bonusar från utrustning. */
+    public int getBaseDefense() {
+        return baseDefense;
+    }
+
     @Override
     public void takeDamage(int amount) {
         if (amount < 0) {
