@@ -1,7 +1,9 @@
 package fangdjupet.game;
 
+import fangdjupet.combat.Hero;
 import fangdjupet.contract.AttackStrategy;
 import fangdjupet.contract.Combatant;
+import fangdjupet.contract.Equippable;
 
 import java.util.List;
 import java.util.Scanner;
@@ -93,8 +95,26 @@ public class Menu {
     }
 
     private void showEquipment() {
-        if (requireActiveAdventure()) {
-            notImplemented("Visa hjältens utrustning");
+        if (!requireActiveAdventure()) {
+            return;
+        }
+        Hero hero = game.getHero().orElseThrow();
+
+        System.out.println();
+        System.out.println("=== " + hero.getName() + " ===");
+        System.out.println("Hälsa: " + hero.getHealth() + "/" + hero.getMaxHealth());
+        System.out.println("Anfall: " + hero.getAttack() + "   Försvar: " + hero.getDefense());
+        System.out.println("Anfallsstil: " + hero.getAttackStrategy().getName());
+        System.out.println("Utrustning:");
+
+        List<Equippable> equipment = hero.getEquipment();
+        if (equipment.isEmpty()) {
+            System.out.println("  (ingen utrustning ännu)");
+            return;
+        }
+        for (Equippable item : equipment) {
+            System.out.println("  " + item.getName() + " (nivå " + item.getLevel() + ")"
+                    + "  anfall +" + item.getAttackBonus() + ", försvar +" + item.getDefenseBonus());
         }
     }
 
