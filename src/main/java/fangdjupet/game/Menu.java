@@ -4,6 +4,7 @@ import fangdjupet.combat.Hero;
 import fangdjupet.contract.AttackStrategy;
 import fangdjupet.contract.Combatant;
 import fangdjupet.contract.Equippable;
+import fangdjupet.contract.Item;
 
 import java.util.List;
 import java.util.Scanner;
@@ -40,6 +41,7 @@ public class Menu {
         System.out.println("2. Fortsätt sparat äventyr");
         System.out.println("3. Visa hjältens utrustning");
         System.out.println("4. Strid mot nästa fiende");
+        System.out.println("5. Drick läkedryck");
         System.out.println("0. Avsluta");
         System.out.print("Välj: ");
     }
@@ -50,6 +52,7 @@ public class Menu {
             case "2" -> continueSavedAdventure();
             case "3" -> showEquipment();
             case "4" -> fightNextEnemy();
+            case "5" -> drinkPotion();
             case "0" -> quit();
             default -> System.out.println("Ogiltigt val, försök igen.");
         }
@@ -110,11 +113,28 @@ public class Menu {
         List<Equippable> equipment = hero.getEquipment();
         if (equipment.isEmpty()) {
             System.out.println("  (ingen utrustning ännu)");
-            return;
         }
         for (Equippable item : equipment) {
-            System.out.println("  " + item.getName() + " (nivå " + item.getLevel() + ")"
-                    + "  anfall +" + item.getAttackBonus() + ", försvar +" + item.getDefenseBonus());
+            System.out.println("  " + item + "  anfall +" + item.getAttackBonus()
+                    + ", försvar +" + item.getDefenseBonus());
+        }
+
+        System.out.println("Ryggsäck:");
+        List<Item> backpack = game.getInventory().getItems();
+        if (backpack.isEmpty()) {
+            System.out.println("  (tom)");
+        }
+        for (Item item : backpack) {
+            System.out.println("  " + item);
+        }
+    }
+
+    private void drinkPotion() {
+        if (!requireActiveAdventure()) {
+            return;
+        }
+        if (game.drinkPotion().isEmpty()) {
+            System.out.println("Du har ingen läkedryck att dricka.");
         }
     }
 
