@@ -1,7 +1,9 @@
 package fangdjupet.game;
 
+import fangdjupet.contract.AttackStrategy;
 import fangdjupet.contract.Combatant;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -53,12 +55,37 @@ public class Menu {
 
     private void startNewAdventure() {
         System.out.print("Vad heter din hjälte? ");
-        String name = scanner.hasNextLine() ? scanner.nextLine() : "";
-        game.startNewAdventure(AdventureSetup.createHero(name), AdventureSetup.createEnemies());
+        String name = readLine();
+        AttackStrategy attackStyle = chooseAttackStyle();
+        game.startNewAdventure(AdventureSetup.createHero(name, attackStyle), AdventureSetup.createEnemies());
 
         Combatant hero = game.getHero().orElseThrow();
-        System.out.println(hero.getName() + " kliver ner i Fångdjupet. "
-                + game.getRemainingEnemyCount() + " fiender väntar.");
+        System.out.println(hero.getName() + " kliver ner i Fångdjupet med " + attackStyle.getName().toLowerCase()
+                + ". " + game.getRemainingEnemyCount() + " fiender väntar.");
+    }
+
+    private AttackStrategy chooseAttackStyle() {
+        List<AttackStrategy> styles = AdventureSetup.availableAttackStyles();
+        System.out.println("Välj anfallsstil:");
+        for (int i = 0; i < styles.size(); i++) {
+            System.out.println((i + 1) + ". " + styles.get(i).getName());
+        }
+        System.out.print("Välj: ");
+
+        try {
+            int choice = Integer.parseInt(readLine().trim());
+            if (choice >= 1 && choice <= styles.size()) {
+                return styles.get(choice - 1);
+            }
+        } catch (NumberFormatException e) {
+            // Ogiltig inmatning hanteras nedan
+        }
+        System.out.println("Ogiltigt val, du får " + styles.get(0).getName().toLowerCase() + ".");
+        return styles.get(0);
+    }
+
+    private String readLine() {
+        return scanner.hasNextLine() ? scanner.nextLine() : "";
     }
 
     private void continueSavedAdventure() {
