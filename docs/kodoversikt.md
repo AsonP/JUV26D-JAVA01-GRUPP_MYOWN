@@ -104,7 +104,9 @@ Strategierna räknar bara ut skadan. Det är `BaseCharacter.attack()` som drar a
 |---|---|
 | `Menu` | Visar menyn, läser in val och skriver ut resultat. Innehåller ingen spellogik. |
 | `Game` | Spelmotorn: hjälten, fiendekön, ryggsäcken, byte efter strid och drycker |
-| `EventLog` | Lyssnar på händelser och skriver ut dem i konsolen |
+| `EventLog` | Lyssnar på händelser och skriver ut dem i konsolen, färgade efter händelsetyp |
+| `ConsoleStyle` | Färger och utseende i konsolen: hälsostapel, rubriker och färger för händelser |
+| `ConsoleColor` | Enum med ANSI-färgkoderna (American National Standards Institute) |
 | `AdventureSetup` | Skapar hjälten och fienderna för ett nytt äventyr |
 | `SaveManager` | Sparar och läser in ett äventyr som en textfil |
 | `SavedAdventure` | En record med det som lästes in från sparfilen |
@@ -149,7 +151,18 @@ sequenceDiagram
 2. `Game` låter `Battle` köra rundan. `Battle` skickar en händelse för varje slag, och `EventLog` skriver ut den.
 3. Om fienden besegrades tar `Game` bort den ur kön, skapar ett föremål med `ItemFactory` och antingen
    tar på det (om det är ett bättre vapen eller en bättre rustning) eller lägger det i ryggsäcken.
-4. `Menu` skriver ut hjältens hälsa och hur många fiender som är kvar, och sparar äventyret.
+4. `Menu` skriver ut hjältens hälsostapel och hur många fiender som är kvar, och sparar äventyret.
+
+### Färger och hälsostapel
+
+Alla utskrifter som har färg går genom `ConsoleStyle`. Hälsan visas som en stapel med tio fält,
+till exempel `[██████░░░░] 22/40`. Den är grön över 60 procent, gul över 30 procent och röd under det.
+Stapeln avrundas uppåt, så att en hjälte som lever alltid har minst ett fyllt fält.
+`EventLog` färgar händelsetypen: grönt för besegrade fiender och använda drycker, gult för hittade föremål,
+rött när hjälten faller och cyan för övrigt.
+
+`ConsoleStyle` kontrollerar en gång om miljövariabeln `NO_COLOR` är satt. Är den det skrivs texten ut utan
+färgkoder. Det är en vanlig konvention för terminalprogram.
 
 ### Spara och fortsätta (menyval 2 och 0)
 
@@ -167,7 +180,9 @@ Vid inläsning läser `SaveManager` raderna, återskapar hjälten och fienderna 
 - **Det som är svårt att styra skickas in.** `Scanner`, `PrintStream`, `Random` och sökvägen till sparfilen
   skickas in utifrån. I testerna kan de ersättas, till exempel med en `Random` som alltid väljer vapen.
 - **Ingen duplicering.** Gemensamt beteende ligger på ett ställe: `BaseCharacter` för karaktärer,
-  `AbstractItem` för föremål och `DamageRules` för minsta skada.
+  `AbstractItem` för föremål, `DamageRules` för minsta skada och `printHeroStatus()` i menyn för hjältens status.
+- **Utseende på ett ställe.** Färger och hälsostapel finns bara i `ConsoleStyle`. Vill man ändra färgerna
+  eller stapeln görs det där, och resten av koden påverkas inte.
 - **Listor som inte kan ändras utifrån.** `getEquipment()`, `getItems()` och `getEnemies()` returnerar
   listor som inte kan ändras, så att innehållet bara kan ändras via klassens egna metoder.
 
@@ -182,3 +197,4 @@ Några exempel på hur koden kan byggas ut, och var ändringen görs:
 | En ny föremålstyp | Ett nytt värde i `ItemType`, en ny klass i `item` och ett nytt fall i `ItemFactory` |
 | Fler eller andra fiender i äventyret | `AdventureSetup.createEnemies()` |
 | En ny lyssnare, till exempel en logg till fil | En ny klass som implementerar `GameEventListener`, registrerad i `Main` |
+| Andra färger eller en annan hälsostapel | `ConsoleStyle` och `ConsoleColor` |

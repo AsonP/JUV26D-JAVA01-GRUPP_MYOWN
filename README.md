@@ -6,6 +6,8 @@ Ett textbaserat rollspel i konsolen där en hjälte slåss sig igenom en serie f
 Hjälten väljer anfallsstil, hittar vapen, rustningar och läkedrycker efter varje seger, och äventyret
 sparas automatiskt så att det kan fortsättas senare.
 
+En översikt av hur koden är uppbyggd finns i [docs/kodoversikt.md](docs/kodoversikt.md).
+
 Gruppuppgift i kursen JAVA01 (JUV26D). Fokus ligger på att arbeta som ett litet utvecklingsteam:
 feature branches, pull requests, kodgranskning och enkla designmönster.
 
@@ -56,6 +58,8 @@ Statusbrickan överst visar resultatet av den senaste körningen.
   Övriga föremål hamnar i ryggsäcken.
 - **Sparande:** äventyret sparas automatiskt efter varje händelse och när spelaren avslutar.
   När äventyret är vunnet eller förlorat tas sparfilen bort.
+- **Färger:** hälsan visas som en stapel som går från grön till gul till röd, och händelseloggen är färgkodad.
+  Färgerna stängs av om miljövariabeln `NO_COLOR` är satt.
 
 ## Projektstruktur och ansvar
 
@@ -64,7 +68,7 @@ Statusbrickan överst visar resultatet av den senaste körningen.
 | `fangdjupet.contract` | Gemensamma interfaces, records och enums som modulerna delar | Hela gruppen |
 | `fangdjupet.combat` | Hjälte, fiender, anfallsstrategier, turordning i strid och fiendefabrik | |
 | `fangdjupet.item` | Vapen, rustningar, drycker, generiskt inventarium och föremålsfabrik | |
-| `fangdjupet.game` | Meny, spelmotor, händelselogg och sparfunktion | |
+| `fangdjupet.game` | Meny, spelmotor, händelselogg, sparfunktion och färger i konsolen | |
 
 Modulerna känner till varandra genom kontraktet i `fangdjupet.contract`. Spelmotorn i `fangdjupet.game`
 är den enda modul som använder de andra modulernas klasser direkt, eftersom det är den som sätter ihop spelet.
@@ -110,7 +114,7 @@ så att menyn kan visa ett begripligt meddelande i stället för att programmet 
 
 ## Tester
 
-JUnit 5-tester finns för den centrala logiken i varje modul:
+JUnit 5-tester finns för den centrala logiken i varje modul, totalt 55 tester:
 
 | Testklass | Testar |
 |---|---|
@@ -121,6 +125,15 @@ JUnit 5-tester finns för den centrala logiken i varje modul:
 | `ItemFactoryTest` | Föremål och bonusar per typ och nivå |
 | `GameTest` | Spelmotorn, byte efter strid, utrustning och drycker |
 | `SaveManagerTest` | Spara, läsa in och felhantering, med en tillfällig katalog (`@TempDir`) |
+| `ConsoleStyleTest` | Färggränser och hälsostapeln |
+
+## Färger i konsolen
+
+Färgerna bygger på ANSI-koder (American National Standards Institute), specialtecken som terminalen tolkar
+som färgbyten. All färghantering är samlad i `ConsoleStyle`, och färgerna finns som en enum, `ConsoleColor`.
+Metoderna som väljer färg och bygger hälsostapeln returnerar enum-värden och text utan färgkoder,
+så att de går att testa. IntelliJ:s konsol och Windows Terminal visar färgerna. Om en terminal i stället
+visar koderna som tecken kan färgerna stängas av med miljövariabeln `NO_COLOR`.
 
 ## Arbetssätt med Git (förslag)
 
