@@ -41,7 +41,7 @@ public class Menu {
 
     private void printMenu() {
         System.out.println();
-        System.out.println("=== Fångdjupet ===");
+        System.out.println(ConsoleStyle.heading("Fångdjupet"));
         System.out.println("1. Starta nytt äventyr");
         System.out.println("2. Fortsätt sparat äventyr");
         System.out.println("3. Visa hjältens utrustning");
@@ -106,9 +106,7 @@ public class Menu {
             System.out.println(e.getMessage() + ".");
             return;
         }
-        Hero hero = game.getHero().orElseThrow();
-        System.out.println(hero.getName() + " har " + hero.getHealth() + "/" + hero.getMaxHealth()
-                + " i hälsa. Fiender kvar: " + game.getRemainingEnemyCount());
+        printHeroStatus();
     }
 
     private void showEquipment() {
@@ -118,8 +116,8 @@ public class Menu {
         Hero hero = game.getHero().orElseThrow();
 
         System.out.println();
-        System.out.println("=== " + hero.getName() + " ===");
-        System.out.println("Hälsa: " + hero.getHealth() + "/" + hero.getMaxHealth());
+        System.out.println(ConsoleStyle.heading(hero.getName()));
+        System.out.println("Hälsa: " + ConsoleStyle.health(hero));
         System.out.println("Anfall: " + hero.getAttack() + "   Försvar: " + hero.getDefense());
         System.out.println("Anfallsstil: " + hero.getAttackStrategy().getName());
         System.out.println("Utrustning:");
@@ -173,13 +171,19 @@ public class Menu {
     private void printOutcome() {
         Combatant hero = game.getHero().orElseThrow();
         if (!hero.isAlive()) {
-            System.out.println("Du förlorade. Fångdjupet tog ännu en hjälte.");
+            System.out.println(ConsoleStyle.color("Du förlorade. Fångdjupet tog ännu en hjälte.", ConsoleColor.RED));
         } else if (game.isOver()) {
-            System.out.println("Seger! " + hero.getName() + " har besegrat alla fiender.");
+            System.out.println(ConsoleStyle.color("Seger! " + hero.getName() + " har besegrat alla fiender.",
+                    ConsoleColor.GREEN));
         } else {
-            System.out.println(hero.getName() + " har " + hero.getHealth() + "/" + hero.getMaxHealth()
-                    + " i hälsa. Fiender kvar: " + game.getRemainingEnemyCount());
+            printHeroStatus();
         }
+    }
+
+    private void printHeroStatus() {
+        Hero hero = game.getHero().orElseThrow();
+        System.out.println(hero.getName() + " " + ConsoleStyle.health(hero)
+                + "   Fiender kvar: " + game.getRemainingEnemyCount());
     }
 
     private void quit() {

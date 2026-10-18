@@ -26,7 +26,8 @@ public class EventLog implements GameEventListener {
     @Override
     public void onEvent(GameEvent event) {
         history.add(event);
-        out.println("[" + event.type() + "] " + event.message());
+        out.println(ConsoleStyle.color("[" + event.type() + "]", ConsoleStyle.eventColor(event.type()))
+                + " " + event.message());
     }
 
     public List<GameEvent> getHistory() {
